@@ -1,8 +1,9 @@
+import java.net.InetAddress;
 
 public class Server {
 
-	private InetAddress address
-	private port
+	private InetAddress address;
+	private port;
 
 	public Server ( String ipAddress ) {
 
