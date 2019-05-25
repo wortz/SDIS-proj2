@@ -1,0 +1,20 @@
+classes relevantes:
+
+java.net.Socket
+java.net.ServerSocket
+
+-----------------------------------
+
+java.io.InputStreamReader
+java.io.DataOutputStream
+java.io.etc.
+
+
+
+______________                         ________________
+|            |           req           |               |
+|            |-----------------------> |.[ServerSocket]|
+|  CLIENT    |                         | |      SERVER |
+|            |          resp           | |             |
+|   [Socket].|>----------------------- |.  [Socket]    |
+|____________|                         |_______________|
