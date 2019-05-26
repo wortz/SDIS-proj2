@@ -104,7 +104,7 @@ public class Server {
    	 	if ( args.length == 2 ) 
         	peer_instance = new Server( args[0], Integer.parseInt( args[1]) );
         else {
-        	System.out.println( "WRONG No OF ARGUMENTS" );
+			System.out.println("ERROR - Format must be: Server <ServerIP> <ServerPort>");
         	return;
         }
 	}
