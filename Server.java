@@ -1,4 +1,3 @@
-
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.Random;
 import java.util.Map;
@@ -10,6 +9,12 @@ import java.time.*;
 import java.io.*;
 import java.net.*;
 import java.lang.Exception;
+import java.net.ServerSocket;
+import javax.net.ssl.*;
+import com.sun.net.ssl.internal.ssl.Provider;
+import java.security.Security;
+import java.util.Map;
+import java.util.AbstractMap.SimpleEntry;
 
 public class Server {
 
@@ -17,22 +22,74 @@ public class Server {
 	private int port;
     private ScheduledExecutorService scheduler;
     private Thread electionTimeoutThread;
-    private ServerSSL sslServer;
+    private SSLServerSocket serverSocket;
+    public static HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
+    //private ServerSSL sslServer;
 
-    public static Server peer_instance;	// fazer synchronized ???
+    private static Server server_instance;	// fazer synchronized ???
 
+    public Server () {}
 	public Server ( String ipAddress, int port ) {
+
+		peers = new HashMap<InetAddress, Map.Entry<Integer, SSLSocket>>();
 
 		try {address = InetAddress.getByName( ipAddress );} catch (UnknownHostException e){e.printStackTrace();}
 		this.port = port;
 
-		sslServer = new SSlServer(port);
+		//sslServer = new SSlServer(port, address);
 
 		scheduler = Executors.newScheduledThreadPool(2);
-		startElectionTimeout();
-		startHeartBeat();
+		//startElectionTimeout();
+		//startHeartBeat();
 
-		createListener();
+		//createListener();
+
+		if( SSlAccepter( port, address ) == -1 )
+			System.out.println(" Error creating SSLSocket");
+
+	}
+
+	public synchronized void addPeer( String address, int port, SSLSocket socket ) {
+
+		InetAddress addr = null;
+		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
+		peers.put(addr, new SimpleEntry<Integer,SSLSocket>(port, socket));
+		System.out.println(peers);
+		new Listener(socket).start();
+
+	}
+
+	private int SSlAccepter( int port, InetAddress address ) {
+
+		Security.addProvider(new Provider());
+		System.setProperty("javax.net.ssl.keyStore","sdis.store");
+		System.setProperty("javax.net.ssl.keyStorePassword","password");
+		//System.setProperty("javax.net.debug","all");
+		try {
+			serverSocket = (SSLServerSocket)((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(port, 50, address);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return -1;
+		}
+
+		System.out.println("Server up & ready for connections");
+
+        //serverSocket.startHandshake();
+		
+		try {
+
+			while(true) {
+
+				new ServerThread((SSLSocket) serverSocket.accept()).start();
+				System.out.println("accepted connection");
+
+			}
+
+		} catch( IOException e){
+			e.printStackTrace();
+		}
+
+		return 1;
 
 	}
 
@@ -72,7 +129,7 @@ public class Server {
 	public void startHeartBeat () {
 
 		int period = new Random().nextInt(150 + 1)  + 150;	// 150 a 300 ms
-		ScheduledFuture<?> result = scheduler.scheduleAtFixedRate(new Thread(new HeartBeat(friendPeers)), period, period, TimeUnit.MILLISECONDS);
+		//ScheduledFuture<?> result = scheduler.scheduleAtFixedRate(new Thread(new HeartBeat(friendPeers)), period, period, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -96,17 +153,24 @@ public class Server {
 
 	}
 
+	// static method to create instance of Peer class
+	public static Server getInstance() { 
+		if( server_instance == null ){
+			server_instance = new Server();
+		}
+		return server_instance;
+	}
+
+
 	// ip
 	// port
-	// tamanho do cluster
 	public static void main( String[] args ) {
-
-   	 	if ( args.length == 2 ) 
-        	peer_instance = new Server( args[0], Integer.parseInt( args[1]) );
+   	 	if ( args.length == 2 ) {
+    		server_instance = new Server( args[0], Integer.parseInt( args[1]) );
+   	 	}
         else {
 			System.out.println("ERROR - Format must be: Server <ServerIP> <ServerPort>");
         	return;
         }
 	}
-
 }
