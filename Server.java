@@ -15,52 +15,22 @@ public class Server {
 
 	private InetAddress address;
 	private int port;
-	private int nServers = 5;
     private ScheduledExecutorService scheduler;
     private Thread electionTimeoutThread;
-    public HashMap<InetAddress, Integer> friendPeers;
+    private ServerSSL sslServer;
 
-    public static ServerPeer peer_instance;	// fazer synchronized ???
-
-    private State state;
-
-    enum State {
-  		FOLLOWER,
-  		CANDIDATE,
-  		LEADER
-	}
+    public static Server peer_instance;	// fazer synchronized ???
 
 	public Server ( String ipAddress, int port ) {
 
-		state = State.FOLLOWER;
-
 		try {address = InetAddress.getByName( ipAddress );} catch (UnknownHostException e){e.printStackTrace();}
 		this.port = port;
-		friendPeers = new HashMap<InetAddress,Integer>();
+
+		sslServer = new SSlServer(port);
 
 		scheduler = Executors.newScheduledThreadPool(2);
 		startElectionTimeout();
 		startHeartBeat();
-
-		createListener();
-
-	}
-
-	public Server ( String ipAddress, int port, String ipAddressDest, int portDest ) {
-
-		state = State.FOLLOWER;
-
-		InetAddress addressDest = null;
-
-		try {
-			address = InetAddress.getByName( ipAddress );
-			addressDest = InetAddress.getByName( ipAddressDest );
-		} catch (UnknownHostException e){e.printStackTrace();}
-		this.port = port;
-		friendPeers = new HashMap<InetAddress,Integer>();
-
-		tryToRegistry( addressDest, portDest );
-		//startHeartBeat();
 
 		createListener();
 
@@ -132,9 +102,7 @@ public class Server {
 	public static void main( String[] args ) {
 
    	 	if ( args.length == 2 ) 
-        	peer_instance = new ServerPeer( args[0], Integer.parseInt( args[1]) );
-    	else if ( args.length == 4 )
-        	peer_instance = new ServerPeer( args[0], Integer.parseInt( args[1]), args[2],  Integer.parseInt( args[3]) );
+        	peer_instance = new Server( args[0], Integer.parseInt( args[1]) );
         else {
         	System.out.println( "WRONG No OF ARGUMENTS" );
         	return;

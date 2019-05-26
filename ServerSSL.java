@@ -7,13 +7,13 @@ import java.security.Security;
 public class ServerSSL
 {
 	//argv[0] portNumber
-	public static void main(String [] arstring) throws IOException
+	public static void main(int port) throws IOException
 	{
 		Security.addProvider(new Provider());
 		System.setProperty("javax.net.ssl.keyStore","sdis.store");
 		System.setProperty("javax.net.ssl.keyStorePassword","password");
 		//System.setProperty("javax.net.debug","all");
-		SSLServerSocket serverSocket = (SSLServerSocket)((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(Integer.parseInt(arstring[0]));
+		SSLServerSocket serverSocket = (SSLServerSocket)((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(Integer.parseInt(port));
 		System.out.println("Server up & ready for connections");
 
         //serverSocket.startHandshake();
