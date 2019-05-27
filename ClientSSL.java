@@ -43,7 +43,7 @@ public class ClientSSL
 			System.out.println("Server response: " + inFromServer.readUTF());
 
 			try{
-				Thread.sleep(4000);
+				Thread.sleep(4000);			// testar se o server recebe as mensagens
 			} catch(Exception e){
 				e.printStackTrace();
 			}

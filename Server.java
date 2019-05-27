@@ -23,7 +23,7 @@ public class Server {
     private ScheduledExecutorService scheduler;
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
-    public static HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
+    private static HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
     //private ServerSSL sslServer;
 
     private static Server server_instance;	// fazer synchronized ???
@@ -44,8 +44,18 @@ public class Server {
 
 		//createListener();
 
+		createPeerChecker();
+
 		if( SSlAccepter( port, address ) == -1 )
 			System.out.println(" Error creating SSLSocket");
+
+	}
+
+	private createPeerChecker() {
+
+		scheduler.scheduleAtFixedRate(new Thread( new Runnable() {public void run (){
+			System.out.println("created thread");
+		}} ), 1000, 1000, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -95,7 +105,7 @@ public class Server {
 
 	private void startElectionTimeout() {
 
-		ScheduledFuture<?> result = scheduler.scheduleAtFixedRate(new Thread( new Runnable() {public void run (){
+		scheduler.scheduleAtFixedRate(new Thread( new Runnable() {public void run (){
 			System.out.println("created thread");
 		}} ), 1000, 1000, TimeUnit.MILLISECONDS);
 
@@ -119,7 +129,7 @@ public class Server {
 
 	}
 
-	private void createListener() {
+	private void createListener() {		 // 1 listener por cada peer conectado. Eficiente??
 
         Thread listener = new Thread( new ServerListener(port, address));
         listener.start();
@@ -161,6 +171,7 @@ public class Server {
 		return server_instance;
 	}
 
+	public static synchronized HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
 
 	// ip
 	// port

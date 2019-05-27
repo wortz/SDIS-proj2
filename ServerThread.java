@@ -12,7 +12,7 @@ public class ServerThread extends Thread{
 	SSLSocket socket;
 	
 	ServerThread( SSLSocket socket ) {
-		this.socket=socket;
+		this.socket = socket;
 	}
 	
 	public void run() {
@@ -55,7 +55,7 @@ public class ServerThread extends Thread{
 
 	private void handleMessage( String msg ) {
 
-		String[] params = msg.split(":");
+		String[] params = msg.split(" ");
 
 		System.out.println( "params: " + params[0] + "..." + params[1] + "..." + params[2] );
 

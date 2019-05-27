@@ -8,12 +8,19 @@ import javax.net.ssl.SSLSocket;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
 
-public class Listener extends Thread{
+public class Listener extends Thread {
 
 	SSLSocket socket;
+	TimerTask peerTimeout;
 	
 	public Listener( SSLSocket socket ) {
-		this.socket=socket;
+		this.socket = socket;
+
+		Timer timer = new Timer();
+		peerTimeout = new TimerTask() {
+			Server.getInstance().peers.remove(socket.getInetAddress());
+		}
+		timer.schedule(peerTimeout, 1*1100);
 	}
 	
 	public void run() {
@@ -36,14 +43,16 @@ public class Listener extends Thread{
 		//String ap = socket.getApplicationProtocol();
 		//System.out.println("Application Protocol server side: \"" + ap + "\"");
 
+		/*
 		try {
 
 			DataOutputStream sendResponse = new DataOutputStream(socket.getOutputStream());
-			sendResponse.writeUTF("Ur registered successfully. Ready to receive messages.");
+			sendResponse.writeUTF("CONFIRMATION");
 		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		*/
 
 		while(true){
 
@@ -65,10 +74,22 @@ public class Listener extends Thread{
 
 	private void handleMessage( String msg ) {
 
-		String[] params = msg.split("");
+		String[] params = msg.split(" ");
 
-		if( params[0] == "BACKUP" ){
+		switch(params[0]){
+
+			case "ONLINE":
+			System.out.println("client is ONLINE");
+			peerTimeout.cancel();							// para dar reset ao timeout
+			timer.schedule(peerTimeout, 1*1100);
+			break;
+
+			case "BACKUP":
 			System.out.println("client wanna do a BACKUP");
+			break;
+
+		}
+		if( params[0] == "BACKUP" ){
 		}
 
 	}
