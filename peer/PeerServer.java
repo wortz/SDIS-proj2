@@ -9,15 +9,27 @@ import java.net.Socket;
 
 public class PeerServer implements Runnable{
     private static InetAddress peerAddress;
+    private static int port;
     private static ServerSocket peerSocket;
 
-    public PeerServer(String addr, int port){
+    public PeerServer(String address, int portt){
         try{
-        peerAddress = InetAddress.getByName(addr);
+        peerAddress=InetAddress.getByName(address);
+        port = portt;
         peerSocket= new ServerSocket(port,10,peerAddress);
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+
+    public synchronized static InetAddress getInetAddress(){
+        return peerAddress;
+    }
+
+
+    public synchronized static int getPort(){
+        return port;
     }
 
     @Override
@@ -38,7 +50,4 @@ public class PeerServer implements Runnable{
             e.printStackTrace();
         }
     }
-
-
-
 }

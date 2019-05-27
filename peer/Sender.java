@@ -20,13 +20,25 @@ public class Sender implements Runnable{
                 }
                 switch(requestSplit[0]){
                     case "Backup":
-                        System.out.println("Backup request.");
+                        if(requestSplit.length != 3){
+                            System.out.println("Error: The format must be : BACKUP <filePath> <replicationDegree>");
+                            break;
+                        }
+                        Peer.getServer().sendServerMessage();
                         break;
                     case "Restore":
-                        System.out.println("Restore request.");
+                        if(requestSplit.length != 2){
+                            System.out.println("Error: The format must be : RESTORE <filePath>");
+                            break;
+                        }
+                        Peer.getServer().sendServerMessage();
                         break;
                     case "Delete":
-                        System.out.println("Delete request.");
+                        if(requestSplit.length != 2){
+                            System.out.println("Error: The format must be : DELETE <filePath>");
+                            break;
+                        }
+                        Peer.getServer().sendServerMessage();
                         break;
                     case "Reclaim":
                         System.out.println("That protocol was not implemented.");
