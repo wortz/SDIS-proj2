@@ -1,0 +1,1 @@
+javac *.java peer/*.java
