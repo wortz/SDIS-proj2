@@ -7,7 +7,7 @@ import javax.net.ssl.*;
 import javax.net.ssl.SSLSocket;
 import java.io.DataOutputStream;
 
-public class ServerThread extends Thread{
+public class ServerThread extends Thread {
 
 	SSLSocket socket;
 	
@@ -58,14 +58,16 @@ public class ServerThread extends Thread{
 		String[] params = msg.split(" ");
 
 		System.out.println( "params: " + params[0] + "..." + params[1] + "..." + params[2] );
+			System.out.println( ':' + params[0] + ':' );
+		if (params[0].equals("REGISTRY")) {
+			System.out.println( "Inside REGISTRY" );
+			String peeraddress = params[1].substring(1);
+			int peerport = Integer.parseInt(params[2]);
 
-		String peeraddress = params[1].substring(1);
-		int peerport = Integer.parseInt(params[2]);
-
-		System.out.println( peeraddress + ' ' + peerport );
-		System.out.println(Server.getInstance());
-		Server.getInstance().addPeer( peeraddress, peerport, this.socket);
-
+			System.out.println( peeraddress + ' ' + peerport );
+			System.out.println(Server.getInstance());
+			Server.getInstance().addPeer( peeraddress, peerport, this.socket);
+		}
 		/*
 		try {
 			System.out.println("socket: " + socket);

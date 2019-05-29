@@ -20,7 +20,7 @@ public class Server {
 
 	private InetAddress address;
 	private int port;
-    private ScheduledExecutorService scheduler;
+    private static ScheduledExecutorService scheduler;
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
     private static HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
@@ -38,24 +38,14 @@ public class Server {
 
 		//sslServer = new SSlServer(port, address);
 
-		scheduler = Executors.newScheduledThreadPool(2);
+		scheduler = Executors.newScheduledThreadPool(10);
 		//startElectionTimeout();
 		//startHeartBeat();
 
 		//createListener();
 
-		createPeerChecker();
-
 		if( SSlAccepter( port, address ) == -1 )
 			System.out.println(" Error creating SSLSocket");
-
-	}
-
-	private createPeerChecker() {
-
-		scheduler.scheduleAtFixedRate(new Thread( new Runnable() {public void run (){
-			System.out.println("created thread");
-		}} ), 1000, 1000, TimeUnit.MILLISECONDS);
 
 	}
 
@@ -163,12 +153,23 @@ public class Server {
 
 	}
 
+	public static synchronized void removePeer(InetAddress address) {
+
+		peers.remove(address);
+		System.out.println("pers" + peers);
+
+	}
+
 	// static method to create instance of Peer class
-	public static Server getInstance() { 
+	public static Server getInstance() {
 		if( server_instance == null ){
 			server_instance = new Server();
 		}
 		return server_instance;
+	}
+
+	public static ScheduledExecutorService getScheduler() {
+		return scheduler;
 	}
 
 	public static synchronized HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }

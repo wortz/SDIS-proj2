@@ -7,23 +7,34 @@ import javax.net.ssl.*;
 import javax.net.ssl.SSLSocket;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.*;
 
 public class Listener extends Thread {
 
 	SSLSocket socket;
-	TimerTask peerTimeout;
+	Timer timer;
+	Thread peertimeout;
+	ScheduledFuture<?> future;
 	
 	public Listener( SSLSocket socket ) {
+
 		this.socket = socket;
 
-		Timer timer = new Timer();
-		peerTimeout = new TimerTask() {
-			Server.getInstance().peers.remove(socket.getInetAddress());
-		}
-		timer.schedule(peerTimeout, 1*1100);
+		peertimeout = new Thread( new Runnable() {public void run () {
+			System.out.println("timeout thread");
+			Server.removePeer(socket.getInetAddress());
+			System.out.println(Server.getInstance().getPeers());
+			Listener.stopThread();}		//falta parar a thread Listener
+		} );
+		future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 100, 100, TimeUnit.MILLISECONDS );
+
 	}
 	
 	public void run() {
+		System.out.println("new listener");
 
 		// Get an SSLParameters object from the SSLSocket
 		//SSLParameters sslp = this.socket.getSSLParameters();
@@ -72,6 +83,11 @@ public class Listener extends Thread {
 		}
 	}
 
+	public static void stopThread(){
+		Thread.currentThread().interrupt();				// ESTA MERDA NAO FUNCIONA
+		System.out.println("testssss");
+	}
+
 	private void handleMessage( String msg ) {
 
 		String[] params = msg.split(" ");
@@ -80,8 +96,8 @@ public class Listener extends Thread {
 
 			case "ONLINE":
 			System.out.println("client is ONLINE");
-			peerTimeout.cancel();							// para dar reset ao timeout
-			timer.schedule(peerTimeout, 1*1100);
+			future.cancel(false);							// para dar reset ao timeout
+			future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 100, 100, TimeUnit.MILLISECONDS );
 			break;
 
 			case "BACKUP":
@@ -89,6 +105,7 @@ public class Listener extends Thread {
 			break;
 
 		}
+
 		if( params[0] == "BACKUP" ){
 		}
 
