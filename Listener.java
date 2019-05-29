@@ -12,29 +12,36 @@ import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.*;
 
-public class Listener extends Thread {
+public class Listener implements Runnable {
 
 	SSLSocket socket;
 	Timer timer;
 	Thread peertimeout;
 	ScheduledFuture<?> future;
+	Boolean run;
 	
-	public Listener( SSLSocket socket ) {
+	public Listener( SSLSocket socket, String address ) {
 
 		this.socket = socket;
 
 		peertimeout = new Thread( new Runnable() {public void run () {
 			System.out.println("timeout thread");
-			Server.removePeer(socket.getInetAddress());
-			System.out.println(Server.getInstance().getPeers());
-			Listener.stopThread();}		//falta parar a thread Listener
+			System.out.println("sessino : " + socket.getSession());
+			Server.removePeer(address);
+			//System.out.println(Server.getInstance().getPeers());
+			run = false;
+			System.out.println(run);
+			future.cancel(false);
+			//Server.getScheduler().
+			}		//falta parar a thread Listener
 		} );
-		future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 100, 100, TimeUnit.MILLISECONDS );
+		future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 1100, 1100, TimeUnit.MILLISECONDS );
 
 	}
 	
 	public void run() {
-		System.out.println("new listener");
+		run = true;
+		System.out.println("new Listener");
 
 		// Get an SSLParameters object from the SSLSocket
 		//SSLParameters sslp = this.socket.getSSLParameters();
@@ -65,14 +72,16 @@ public class Listener extends Thread {
 		}
 		*/
 
-		while(true){
 
+		while(run){
+			System.out.println("inside while Listener");
 			try {
 
 					BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 					System.out.println("before readline LISTENER");
 					String msg = inFromClient.readLine();
 					System.out.println("after readline LISTENER");
+					if(!run){ return;}										//já deu timeout
 					System.out.println("Client message: " + msg);
 
 					handleMessage( msg );
@@ -81,11 +90,6 @@ public class Listener extends Thread {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static void stopThread(){
-		Thread.currentThread().interrupt();				// ESTA MERDA NAO FUNCIONA
-		System.out.println("testssss");
 	}
 
 	private void handleMessage( String msg ) {
@@ -97,16 +101,13 @@ public class Listener extends Thread {
 			case "ONLINE":
 			System.out.println("client is ONLINE");
 			future.cancel(false);							// para dar reset ao timeout
-			future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 100, 100, TimeUnit.MILLISECONDS );
+			future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 1100, 1100, TimeUnit.MILLISECONDS );
 			break;
 
 			case "BACKUP":
 			System.out.println("client wanna do a BACKUP");
 			break;
 
-		}
-
-		if( params[0] == "BACKUP" ){
 		}
 
 	}

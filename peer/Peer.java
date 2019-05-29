@@ -19,7 +19,7 @@ public class Peer {
         new Thread(server).start();
         //exec.execute(server);
 
-        //exec.scheduleWithFixedDelay(server,0,100,TimeUnit.MILLISECONDS);
+        exec.scheduleWithFixedDelay(server,2000,2000,TimeUnit.MILLISECONDS);
         
     }
 

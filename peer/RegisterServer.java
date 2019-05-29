@@ -34,10 +34,14 @@ public class RegisterServer implements Runnable{
         System.setProperty("javax.net.ssl.trustStorePassword","password");
         Security.addProvider(new Provider());
 		int port = 4040;
-        try {
+
+        try{
             socket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(address, port);
             socket.startHandshake();
-        } catch(IOException e){
+            DataInputStream inFromServer = new DataInputStream(socket.getInputStream());
+            DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
+            outToServer.writeBytes("REGISTRY " + PeerServer.getInetAddress() + " " + PeerServer.getPort() + '\n');
+        } catch(Exception e){
             e.printStackTrace();
         }
 
@@ -46,19 +50,11 @@ public class RegisterServer implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("new thread");
+        System.out.println("new thread RegisterServer");
 
-        try{
-			DataInputStream inFromServer = new DataInputStream(socket.getInputStream());
-            DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
-            outToServer.writeBytes("REGISTRY " + PeerServer.getInetAddress() + " " + PeerServer.getPort() + '\n');
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-
-        timer = new Timer();
-        task = new TimerTask() {
-            public void run () { 
+        //timer = new Timer();
+        //task = new TimerTask() {
+            //public void run () {
                 try{
                     System.out.println("INside task thread");
                     DataInputStream inFromServer = new DataInputStream(socket.getInputStream());
@@ -67,9 +63,9 @@ public class RegisterServer implements Runnable{
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-        };
-        timer.scheduleAtFixedRate(task, 1*500, 1*500);
+        //   }
+        //};
+        //timer.scheduleAtFixedRate(task, 1*500, 1*500);
         System.out.println("end thread");
     }
 

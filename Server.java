@@ -23,7 +23,7 @@ public class Server {
     private static ScheduledExecutorService scheduler;
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
-    private static HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
+    private static HashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
     //private ServerSSL sslServer;
 
     private static Server server_instance;	// fazer synchronized ???
@@ -31,7 +31,7 @@ public class Server {
     public Server () {}
 	public Server ( String ipAddress, int port ) {
 
-		peers = new HashMap<InetAddress, Map.Entry<Integer, SSLSocket>>();
+		peers = new HashMap<String, Map.Entry<Integer, SSLSocket>>();
 
 		try {address = InetAddress.getByName( ipAddress );} catch (UnknownHostException e){e.printStackTrace();}
 		this.port = port;
@@ -51,11 +51,13 @@ public class Server {
 
 	public synchronized void addPeer( String address, int port, SSLSocket socket ) {
 
+		System.out.println("AddPeer");
+
 		InetAddress addr = null;
 		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
-		peers.put(addr, new SimpleEntry<Integer,SSLSocket>(port, socket));
+		peers.put(address, new SimpleEntry<Integer,SSLSocket>(port, socket));
 		System.out.println(peers);
-		new Listener(socket).start();
+		new Thread( new Listener(socket, address)).start();
 
 	}
 
@@ -119,12 +121,14 @@ public class Server {
 
 	}
 
+/*
 	private void createListener() {		 // 1 listener por cada peer conectado. Eficiente??
 
         Thread listener = new Thread( new ServerListener(port, address));
         listener.start();
 
 	}
+*/
 
 	public void startHeartBeat () {
 
@@ -153,10 +157,15 @@ public class Server {
 
 	}
 
-	public static synchronized void removePeer(InetAddress address) {
+	public static synchronized void removePeer(String address) {
 
-		peers.remove(address);
-		System.out.println("pers" + peers);
+
+		String addr = address.toString();
+		System.out.println("addr : " + addr);
+
+		System.out.println("pers before remove" + peers);
+		peers.remove(addr);
+		System.out.println("pers after remove" + peers);
 
 	}
 
@@ -172,7 +181,7 @@ public class Server {
 		return scheduler;
 	}
 
-	public static synchronized HashMap<InetAddress, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
+	public static synchronized HashMap<String, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
 
 	// ip
 	// port
