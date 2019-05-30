@@ -11,15 +11,15 @@ public class Peer {
     private static RegisterServer server;
 
     public Peer(String[] args){
-        exec = new ScheduledThreadPoolExecutor(10);
+        exec = new ScheduledThreadPoolExecutor(99);
         peerServer = new PeerServer(args[0],Integer.parseInt(args[1]));
         server = new RegisterServer();
         exec.execute(peerServer);
         exec.execute(new Sender());
-        new Thread(server).start();
+        //new Thread(server).start();
         //exec.execute(server);
 
-        exec.scheduleWithFixedDelay(server,2000,2000,TimeUnit.MILLISECONDS);
+        //exec.scheduleWithFixedDelay(server,2000,2000,TimeUnit.MILLISECONDS);
         
     }
 

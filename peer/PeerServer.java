@@ -16,7 +16,7 @@ public class PeerServer implements Runnable{
         try{
         peerAddress=InetAddress.getByName(address);
         port = portt;
-        peerSocket= new ServerSocket(port,10,peerAddress);
+        peerSocket = new ServerSocket(port,10,peerAddress);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -41,10 +41,9 @@ public class PeerServer implements Runnable{
                 Socket connectionSocket = peerSocket.accept();
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                request = inFromClient.readLine();
-                System.out.println("Received: " + request);
-                capitalizedRequest = request.toUpperCase() + 'n';
-                outToClient.writeBytes(capitalizedRequest);
+                System.out.println(inFromClient.readLine());
+                //System.out.println("Received: " + request);
+                connectionSocket.close();
            }
         }catch(Exception e){
             e.printStackTrace();

@@ -3,6 +3,8 @@ package peer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import protocol.*;
+
 public class Sender implements Runnable{
 
     @Override
@@ -19,12 +21,12 @@ public class Sender implements Runnable{
                     continue;
                 }
                 switch(requestSplit[0]){
-                    case "Backup":
+                    case "BACKUP":
                         if(requestSplit.length != 3){
                             System.out.println("Error: The format must be : BACKUP <filePath> <replicationDegree>");
                             break;
                         }
-                        Peer.getServer().sendServerMessage();
+                        Peer.getExec().execute(new Backup(requestSplit[1], Integer.parseInt(requestSplit[2])));
                         break;
                     case "Restore":
                         if(requestSplit.length != 2){
