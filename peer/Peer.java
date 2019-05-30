@@ -16,8 +16,15 @@ public class Peer {
         server = new RegisterServer();
         exec.execute(peerServer);
         exec.execute(new Sender());
+<<<<<<< HEAD
         //exec.scheduleWithFixedDelay(server,500,500,TimeUnit.MILLISECONDS);
         
+=======
+        new Thread(server).start();
+        //exec.execute(server);
+
+        exec.scheduleWithFixedDelay(server,2000,2000,TimeUnit.MILLISECONDS);
+>>>>>>> 80a224bd343b0cd67715eaf97ece49c187f56682
         
     }
 

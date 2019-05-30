@@ -6,6 +6,7 @@ import java.net.Socket;
 import javax.net.ssl.*;
 import javax.net.ssl.SSLSocket;
 import java.io.DataOutputStream;
+import java.util.*;
 
 public class ServerThread extends Thread {
 
@@ -45,6 +46,8 @@ public class ServerThread extends Thread {
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
  			String msg = bufferedReader.readLine();
 			System.out.println("Client message: " + msg);
+			//Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+			System.out.println("THREADS: " + threadSet);
 
 			handleMessage( msg );
 
