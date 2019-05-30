@@ -44,7 +44,6 @@ public class PeerServer implements Runnable{
                 request = inFromClient.readLine();
                 System.out.println("Received: " + request);
                 capitalizedRequest = request.toUpperCase() + 'n';
-                outToClient.writeBytes(capitalizedRequest);
            }
         }catch(Exception e){
             e.printStackTrace();
