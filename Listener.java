@@ -14,23 +14,24 @@ import java.util.concurrent.*;
 
 public class Listener implements Runnable {
 
+	//	BACKUPIPS file_name IP1 porta1 IP2 porta2 ...
+
 	SSLSocket socket;
 	Timer timer;
 	Thread peertimeout;
 	ScheduledFuture<?> future;
-	Boolean run;
+	Boolean peerOn;
 	
 	public Listener( SSLSocket socket, String address ) {
 
 		this.socket = socket;
 
-		peertimeout = new Thread( new Runnable() {public void run () {
+		peertimeout = new Thread( new Runnable() {public void run () {		// Nao remove o peer mas diz que está off e para se a thread
 			System.out.println("timeout thread");
-			System.out.println("sessino : " + socket.getSession());
-			Server.removePeer(address);
+			Server.timeoutPeer(address);
 			//System.out.println(Server.getInstance().getPeers());
-			run = false;
-			System.out.println(run);
+			peerOn = false;
+			System.out.println(peerOn);
 			future.cancel(false);
 			//Server.getScheduler().
 			}		//falta parar a thread Listener
@@ -40,7 +41,7 @@ public class Listener implements Runnable {
 	}
 	
 	public void run() {
-		run = true;
+		peerOn = true;
 		System.out.println("new Listener");
 
 		// Get an SSLParameters object from the SSLSocket
@@ -73,7 +74,7 @@ public class Listener implements Runnable {
 		*/
 
 
-		while(run){
+		while(peerOn){
 			System.out.println("inside while Listener");
 			try {
 
@@ -81,7 +82,7 @@ public class Listener implements Runnable {
 					System.out.println("before readline LISTENER");
 					String msg = inFromClient.readLine();
 					System.out.println("after readline LISTENER");
-					if(!run){ return;}										//já deu timeout
+					if(!peerOn){ return;}										//já deu timeout
 					System.out.println("Client message: " + msg);
 
 					handleMessage( msg );
@@ -98,15 +99,16 @@ public class Listener implements Runnable {
 
 		switch(params[0]){
 
-			case "ONLINE":
-			System.out.println("client is ONLINE");
-			future.cancel(false);							// para dar reset ao timeout
-			future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 1100, 1100, TimeUnit.MILLISECONDS );
-			break;
+			case "ONLINE":												// TODO? atualizar o ip e porta? que o peer manda
+				System.out.println("client is ONLINE");
+				future.cancel(false);							// para dar reset ao timeout
+				future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 1100, 1100, TimeUnit.MILLISECONDS );
+				break;
 
-			case "BACKUP":
-			System.out.println("client wanna do a BACKUP");
-			break;
+			case "BACKUP":	// BACKUP <file_path> <replicationDegree>							// criar thread para cada mensagem recebida?
+				System.out.println("client wanna do a BACKUP");
+				
+				break;
 
 		}
 

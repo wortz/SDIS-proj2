@@ -24,6 +24,7 @@ public class Server {
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
     private static HashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
+    private static HashMap<String, Boolean> = peersOn;
     //private ServerSSL sslServer;
 
     private static Server server_instance;	// fazer synchronized ???
@@ -56,6 +57,7 @@ public class Server {
 		InetAddress addr = null;
 		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
 		peers.put(address, new SimpleEntry<Integer,SSLSocket>(port, socket));
+		peersOn.put(address, true);
 		System.out.println(peers);
 		new Thread( new Listener(socket, address)).start();
 
@@ -63,8 +65,7 @@ public class Server {
 
 	private int SSlAccepter( int port, InetAddress address ) {
 
-		Security.addProvider(new Provider());
-		System.setProperty("javax.net.ssl.keyStore","sdis.store");
+		System.setProperty("javax.net.ssl.keyStore","myKeyStore.jks");
 		System.setProperty("javax.net.ssl.keyStorePassword","password");
 		//System.setProperty("javax.net.debug","all");
 		try {
@@ -157,8 +158,13 @@ public class Server {
 
 	}
 
-	public static synchronized void removePeer(String address) {
+	public static void peerTimeout(String address) {
 
+		peersOn.setValue(address, false);
+
+	}
+
+	public static synchronized void removePeer(String address) {
 
 		String addr = address.toString();
 		System.out.println("addr : " + addr);
