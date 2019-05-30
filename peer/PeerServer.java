@@ -7,16 +7,22 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+
 public class PeerServer implements Runnable{
     private static InetAddress peerAddress;
     private static int port;
-    private static ServerSocket peerSocket;
+    private static SSLServerSocket peerSocket;
 
     public PeerServer(String address, int portt){
         try{
         peerAddress=InetAddress.getByName(address);
         port = portt;
-        peerSocket= new ServerSocket(port,10,peerAddress);
+        System.setProperty("javax.net.ssl.keyStore","myKeyStore.jks");
+        System.setProperty("javax.net.ssl.keyStorePassword","password");
+        peerSocket = (SSLServerSocket)((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(port, 50, peerAddress);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -35,15 +41,14 @@ public class PeerServer implements Runnable{
     @Override
     public void run(){
         String request;
-        String capitalizedRequest;
         try{
             while (true) {
-                Socket connectionSocket = peerSocket.accept();
+                
+                SSLSocket connectionSocket = (SSLSocket) peerSocket.accept();
                 BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
                 DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
                 request = inFromClient.readLine();
                 System.out.println("Received: " + request);
-                capitalizedRequest = request.toUpperCase() + 'n';
            }
         }catch(Exception e){
             e.printStackTrace();

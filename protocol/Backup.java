@@ -48,7 +48,7 @@ public class Backup implements Runnable {
         SSLSocket socket;
         try{
             address = InetAddress.getByName("127.0.0.6");
-            System.setProperty("javax.net.ssl.trustStore","sdis.store");
+            System.setProperty("javax.net.ssl.trustStore","myTrustStore.jts");
             System.setProperty("javax.net.ssl.trustStorePassword","password");
             int port = 4040;
             socket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(address, port);
