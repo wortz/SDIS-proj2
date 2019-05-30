@@ -11,7 +11,6 @@ import java.net.*;
 import java.lang.Exception;
 import java.net.ServerSocket;
 import javax.net.ssl.*;
-import com.sun.net.ssl.internal.ssl.Provider;
 import java.security.Security;
 import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
@@ -24,7 +23,7 @@ public class Server {
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
     private static HashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
-    private static HashMap<String, Boolean> peersOn;
+    private static ArrayList<String> peersOn;
     //private ServerSSL sslServer;
 
     private static Server server_instance;	// fazer synchronized ???
@@ -33,6 +32,7 @@ public class Server {
 	public Server ( String ipAddress, int port ) {
 
 		peers = new HashMap<String, Map.Entry<Integer, SSLSocket>>();
+		peersOn = new ArrayList<String>();
 
 		try {address = InetAddress.getByName( ipAddress );} catch (UnknownHostException e){e.printStackTrace();}
 		this.port = port;
@@ -56,9 +56,14 @@ public class Server {
 
 		InetAddress addr = null;
 		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
+		System.out.println("AddPeer2");
 		peers.put(address, new SimpleEntry<Integer,SSLSocket>(port, socket));
-		peersOn.put(address, true);
+		System.out.println("AddPeer3");
+		peersOn.add(address);
+		System.out.println("AddPeer4");
 		System.out.println(peers);
+		System.out.println("AddPeer5");
+		System.out.println(peersOn);
 		new Thread( new Listener(socket, address)).start();
 
 	}
@@ -67,6 +72,8 @@ public class Server {
 
 		System.setProperty("javax.net.ssl.keyStore","server.keys");
 		System.setProperty("javax.net.ssl.keyStorePassword","123456");
+        System.setProperty("javax.net.ssl.trustStore","truststore");
+        System.setProperty("javax.net.ssl.trustStorePassword","123456");
 		//System.setProperty("javax.net.debug","all");
 		try {
 			serverSocket = (SSLServerSocket)((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(port, 50, address);
@@ -160,7 +167,8 @@ public class Server {
 
 	public static void peerTimeout(String address) {
 
-		//peersOn.setValue(address, false);
+		peersOn.remove(peersOn.indexOf(address));
+		System.out.println("Peer removed : " + peersOn);
 
 	}
 
@@ -189,8 +197,8 @@ public class Server {
 
 	public static synchronized HashMap<String, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
 
-	// ip
-	// port
+	public static synchronized ArrayList<String> getPeersOn() { return peersOn; }
+
 	public static void main( String[] args ) {
    	 	if ( args.length == 2 ) {
     		server_instance = new Server( args[0], Integer.parseInt( args[1]) );

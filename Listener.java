@@ -88,6 +88,7 @@ public class Listener implements Runnable {
 					handleMessage( msg );
 
 			} catch(IOException e) {
+				peertimeout.start();
 				e.printStackTrace();
 			}
 		}
@@ -107,7 +108,7 @@ public class Listener implements Runnable {
 
 			case "BACKUP":	// BACKUP <file_path> <replicationDegree>							// criar thread para cada mensagem recebida?
 				System.out.println("client wanna do a BACKUP");
-				
+				new Thread(new ServerMessageHandler(msg)).start();
 				break;
 
 		}
