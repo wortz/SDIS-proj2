@@ -1,1 +1,1 @@
-rm *.class peer/*.class utility/*.class protocol/*.class
+rm *.class peer/*.class

@@ -35,11 +35,12 @@ public class ServerThread extends Thread {
 
         //String ap = socket.getApplicationProtocol();
         //System.out.println("Application Protocol server side: \"" + ap + "\"");
-        try {
+        
+        /*try {
         	socket.startHandshake();
         } catch (Exception e) {
         	e.printStackTrace();
-        }
+        }*/
 
         try {
 
@@ -47,6 +48,7 @@ public class ServerThread extends Thread {
  			String msg = bufferedReader.readLine();
 			System.out.println("Client message: " + msg);
 			//Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
+			//System.out.println("THREADS: " + threadSet);
 
 			handleMessage( msg );
 

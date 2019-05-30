@@ -3,8 +3,6 @@ package peer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import protocol.*;
-
 public class Sender implements Runnable{
 
     @Override
@@ -21,21 +19,21 @@ public class Sender implements Runnable{
                     continue;
                 }
                 switch(requestSplit[0]){
-                    case "BACKUP":
+                    case "Backup":
                         if(requestSplit.length != 3){
                             System.out.println("Error: The format must be : BACKUP <filePath> <replicationDegree>");
                             break;
                         }
-                        Peer.getExec().execute(new Backup(requestSplit[1],Integer.parseInt(requestSplit[2])));
+                        Peer.getServer().sendServerMessage();
                         break;
-                    case "RESTORE":
+                    case "Restore":
                         if(requestSplit.length != 2){
                             System.out.println("Error: The format must be : RESTORE <filePath>");
                             break;
                         }
                         Peer.getServer().sendServerMessage();
                         break;
-                    case "DDELETE":
+                    case "Delete":
                         if(requestSplit.length != 2){
                             System.out.println("Error: The format must be : DELETE <filePath>");
                             break;
@@ -47,7 +45,6 @@ public class Sender implements Runnable{
                         break;
                     default:
                         System.out.println("Not a valid protocol.");
-                        break;
                 }
             }
         }catch(Exception e){

@@ -160,7 +160,7 @@ public class Server {
 
 	public static void peerTimeout(String address) {
 
-		peersOn.replace(address, false);
+		//peersOn.setValue(address, false);
 
 	}
 

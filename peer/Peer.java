@@ -13,11 +13,13 @@ public class Peer {
     public Peer(String[] args){
         exec = new ScheduledThreadPoolExecutor(10);
         peerServer = new PeerServer(args[0],Integer.parseInt(args[1]));
-        //server = new RegisterServer();
+        server = new RegisterServer();
         exec.execute(peerServer);
         exec.execute(new Sender());
-        //exec.scheduleWithFixedDelay(server,500,500,TimeUnit.MILLISECONDS);
-    
+        new Thread(server).start();
+        //exec.execute(server);
+
+        exec.scheduleWithFixedDelay(server,2000,2000,TimeUnit.MILLISECONDS);
         
     }
 
