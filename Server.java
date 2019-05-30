@@ -65,8 +65,8 @@ public class Server {
 
 	private int SSlAccepter( int port, InetAddress address ) {
 
-		System.setProperty("javax.net.ssl.keyStore","myKeyStore.jks");
-		System.setProperty("javax.net.ssl.keyStorePassword","password");
+		System.setProperty("javax.net.ssl.keyStore","server.keys");
+		System.setProperty("javax.net.ssl.keyStorePassword","123456");
 		//System.setProperty("javax.net.debug","all");
 		try {
 			serverSocket = (SSLServerSocket)((SSLServerSocketFactory)SSLServerSocketFactory.getDefault()).createServerSocket(port, 50, address);

@@ -30,8 +30,8 @@ public class RegisterServer implements Runnable{
         } catch(Exception e) {
             e.printStackTrace();
         }
-        System.setProperty("javax.net.ssl.trustStore","myTrustStore.jts");
-        System.setProperty("javax.net.ssl.trustStorePassword","password");
+        System.setProperty("javax.net.ssl.trustStore","truststore");
+        System.setProperty("javax.net.ssl.trustStorePassword","123456");
 		int port = 4040;
 
         try{
