@@ -24,7 +24,7 @@ public class Server {
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
     private static HashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
-    private static HashMap<String, Boolean> = peersOn;
+    private static HashMap<String, Boolean> peersOn;
     //private ServerSSL sslServer;
 
     private static Server server_instance;	// fazer synchronized ???
@@ -160,7 +160,7 @@ public class Server {
 
 	public static void peerTimeout(String address) {
 
-		peersOn.setValue(address, false);
+		peersOn.replace(address, false);
 
 	}
 

@@ -28,7 +28,7 @@ public class Listener implements Runnable {
 
 		peertimeout = new Thread( new Runnable() {public void run () {		// Nao remove o peer mas diz que está off e para se a thread
 			System.out.println("timeout thread");
-			Server.timeoutPeer(address);
+			Server.peerTimeout(address);
 			//System.out.println(Server.getInstance().getPeers());
 			peerOn = false;
 			System.out.println(peerOn);
