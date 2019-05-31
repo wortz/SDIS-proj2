@@ -44,13 +44,13 @@ public class ServerMessageHandler implements Runnable {
 
 		switch (params[0]) {
 			case "BACKUP":
-				handleBackup( params[1], Integer.parseInt(params[2]) );
+				handleBackup( params[1], Integer.parseInt(params[2]), params[3]);
 				break;
 		}
 
 	}
 
-	private int handleBackup( String file_path, int rd ) {
+	private int handleBackup( String file_path, int rd, String fileHash) {
 
 		ArrayList<String> availablePeers = (ArrayList<String>) Server.getPeersOn().clone();
 		availablePeers.remove(peerAddress);
@@ -59,6 +59,7 @@ public class ServerMessageHandler implements Runnable {
 		System.out.println("availablePeers : " + availablePeers + "size: " + npeers);
 
 		String message = "BACKUPIPS " + file_path + " " + rd;
+		ArrayList<String> futureBackups = new ArrayList();
 
 
 		try {
@@ -80,6 +81,8 @@ public class ServerMessageHandler implements Runnable {
 				String addr = availablePeers.get(i);
 				Integer port = peers.get(addr).getKey();
 
+				futureBackups.add(addr + ":" + port + ":" +fileHash);
+
 				try {
 					message += " ";
 					message += addr;
@@ -91,6 +94,9 @@ public class ServerMessageHandler implements Runnable {
 				}
 
 			}
+			Server.getFilesPeers().put(file_path, futureBackups);
+			
+			System.out.println("HASH MAP IS HERE" + Server.getFilesPeers());
 
 			System.out.println("MESSAGE : " + message);
 

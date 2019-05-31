@@ -25,7 +25,10 @@ public class Server {
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
     private static ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
-    private static ArrayList<String> peersOn;
+	
+	//for a file ID saves the peers it is backed up 
+	private static ConcurrentHashMap<String, ArrayList<String>> filesPeers;	// File, ip, port	
+	private static ArrayList<String> peersOn;
     //private ServerSSL sslServer;
 
     private static Server server_instance;	// fazer synchronized ???
@@ -34,6 +37,7 @@ public class Server {
 	public Server ( String ipAddress, int port ) {
 
 		peers = new ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>>();
+		filesPeers = new ConcurrentHashMap<String, ArrayList<String>>();
 		peersOn = new ArrayList<String>();
 
 		try {address = InetAddress.getByName( ipAddress );} catch (UnknownHostException e){e.printStackTrace();}
@@ -196,6 +200,13 @@ public class Server {
 	public static synchronized ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
 
 	public static synchronized ArrayList<String> getPeersOn() { return peersOn; }
+
+	/**
+	 * @return the filesPeers
+	 */
+	public static synchronized ConcurrentHashMap<String, ArrayList<String>> getFilesPeers() {
+		return filesPeers;
+	}
 
 	public static void main( String[] args ) {
    	 	if ( args.length == 2 ) {

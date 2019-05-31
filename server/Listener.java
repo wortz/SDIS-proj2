@@ -113,9 +113,9 @@ public class Listener implements Runnable {
 				future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 5000, 5000, TimeUnit.MILLISECONDS );
 				break;
 
-			case "BACKUP":	// BACKUP <file_path> <replicationDegree>							// criar thread para cada mensagem recebida?
+			case "BACKUP":	// BACKUP <file_path> <replicationDegree> <FileID>							// criar thread para cada mensagem recebida?
 				System.out.println("client wanna do a BACKUP");
-				new Thread(new ServerMessageHandler(msg, socket, address)).start();
+				Server.getScheduler().execute(new ServerMessageHandler(msg, socket, address));
 				break;
 
 		}
