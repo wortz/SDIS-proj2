@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 
 import peer.RegisterServer;
 import utility.Utility;
+import peer.Peer;
 
 public class Backup implements Runnable {
 
@@ -27,8 +28,8 @@ public class Backup implements Runnable {
         File file = new File(this.path);
         String fileID = Utility.getFileSHA(file);
 
-        RegisterServer registerServer = new RegisterServer();
-        registerServer.sendServerMessage("BACKUP " + path + " " + replicationDegree);
+        RegisterServer registerServer = Peer.getServer();
+        registerServer.sendServerMessage("BACKUP " + path + " " + replicationDegree + '\n');
 
 
         try {
@@ -56,7 +57,7 @@ public class Backup implements Runnable {
         }
     }
 
-    //sends the message with file from peer to another peer receiving as arguments the message the ip 
+    //sends the message with file from peer to another peer receiving as arguments the message the ip
     //and port  of the receiving peer
     public void PeerToPeer(byte[] message, String ip, int portt){
         

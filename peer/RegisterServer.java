@@ -20,6 +20,8 @@ public class RegisterServer implements Runnable{
     private static SSLSocket socket;
     Timer timer;
     TimerTask task;
+    private BufferedReader inFromServer;
+    private DataOutputStream outToServer;
 
     public RegisterServer(){
 
@@ -28,15 +30,15 @@ public class RegisterServer implements Runnable{
         } catch(Exception e) {
             e.printStackTrace();
         }
-        System.setProperty("javax.net.ssl.trustStore","truststore");
+        System.setProperty("javax.net.ssl.trustStore","../truststore");
         System.setProperty("javax.net.ssl.trustStorePassword","123456");
 		port = 4040;
 
         try{
             socket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(address, port);
             socket.startHandshake();
-            DataInputStream inFromServer = new DataInputStream(socket.getInputStream());
-            DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
+            inFromServer  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            outToServer = new DataOutputStream(socket.getOutputStream());
             outToServer.writeBytes("REGISTRY " + PeerServer.getInetAddress() + " " + PeerServer.getPort() + '\n');
         } catch(Exception e){
             e.printStackTrace();
@@ -54,8 +56,8 @@ public class RegisterServer implements Runnable{
             //public void run () {
                 try{
                     System.out.println("INside task thread");
-                    DataInputStream inFromServer = new DataInputStream(socket.getInputStream());
-                    DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
+                    //DataInputStream inFromServer = new DataInputStream(socket.getInputStream());
+                    //DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
                     outToServer.writeBytes("ONLINE " + PeerServer.getInetAddress() + " " + PeerServer.getPort() + '\n');
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -68,7 +70,7 @@ public class RegisterServer implements Runnable{
 
     public synchronized void sendServerMessage(String message){       // fazer uma thread para enviar?
         try{
-            DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
+            //DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
             outToServer.writeBytes(message);
 
         } catch(IOException e){
@@ -79,8 +81,8 @@ public class RegisterServer implements Runnable{
     public String receiveServerMessage(){
         String serverResponse = " ";
         try{
-            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            serverResponse = inFromClient.readLine();
+            serverResponse = inFromServer.readLine();
+            System.out.println("Server response : " + serverResponse);
         }catch(IOException e){
             e.printStackTrace();
         }

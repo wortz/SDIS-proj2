@@ -108,7 +108,7 @@ public class Listener implements Runnable {
 			case "ONLINE":												// TODO? atualizar o ip e porta? que o peer manda
 				System.out.println("client is ONLINE");
 				future.cancel(false);							// para dar reset ao timeout
-				future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 1100, 1100, TimeUnit.MILLISECONDS );
+				future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 5000, 5000, TimeUnit.MILLISECONDS );
 				break;
 
 			case "BACKUP":	// BACKUP <file_path> <replicationDegree>							// criar thread para cada mensagem recebida?

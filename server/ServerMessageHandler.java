@@ -9,10 +9,13 @@ import javax.net.ssl.*;
 import javax.net.ssl.SSLSocket;
 import java.io.DataOutputStream;
 import java.io.DataInputStream;
+import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.*;
+import java.util.Map;
 
 public class ServerMessageHandler implements Runnable {
 
@@ -55,12 +58,12 @@ public class ServerMessageHandler implements Runnable {
 
 		try {
 
-	        DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
+	        DataOutputStream outToServer = new DataOutputStream(socketTopeer.getOutputStream());
 	        //outToServer.writeBytes("BACKUPIPS "'\n');
 
 
 			if( npeers < rd ) {
-				System.out.pritln(" Not enough available peers ");
+				System.out.println(" Not enough available peers ");
 				outToServer.writeBytes("ERROR - Not enough peers available for specified replication degree");
 				return 0;
 			}

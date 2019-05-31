@@ -58,13 +58,9 @@ public class Server {
 
 		InetAddress addr = null;
 		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
-		System.out.println("AddPeer2");
 		peers.put(address, new SimpleEntry<Integer,SSLSocket>(port, socket));
-		System.out.println("AddPeer3");
 		peersOn.add(address);
-		System.out.println("AddPeer4");
 		System.out.println(peers);
-		System.out.println("AddPeer5");
 		System.out.println(peersOn);
 		new Thread( new Listener(socket, address)).start();
 
@@ -72,9 +68,9 @@ public class Server {
 
 	private int SSlAccepter( int port, InetAddress address ) {
 
-		System.setProperty("javax.net.ssl.keyStore","server.keys");
+		System.setProperty("javax.net.ssl.keyStore","../server.keys");
 		System.setProperty("javax.net.ssl.keyStorePassword","123456");
-        System.setProperty("javax.net.ssl.trustStore","truststore");
+        System.setProperty("javax.net.ssl.trustStore","../truststore");
         System.setProperty("javax.net.ssl.trustStorePassword","123456");
 		//System.setProperty("javax.net.debug","all");
 		try {
