@@ -1,3 +1,5 @@
+package server;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,7 +16,7 @@ import java.util.concurrent.*;
 
 public class Listener implements Runnable {
 
-	//	BACKUPIPS file_name IP1 porta1 IP2 porta2 ...
+	//	BACKUPIPS file_name 2 IP1 porta1 IP2 porta2 ...
 
 	SSLSocket socket;
 	Timer timer;
@@ -36,7 +38,7 @@ public class Listener implements Runnable {
 			//Server.getScheduler().
 			}		//falta parar a thread Listener
 		} );
-		future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 1100, 1100, TimeUnit.MILLISECONDS );
+		future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 5000, 5000, TimeUnit.MILLISECONDS );
 
 	}
 	
@@ -88,8 +90,11 @@ public class Listener implements Runnable {
 					handleMessage( msg );
 
 			} catch(IOException e) {
-				peertimeout.start();
-				e.printStackTrace();
+				//future.cancel(true);
+				//peertimeout.start();
+				this.peerOn = false;
+				System.out.println("Peer disconnected");
+				//e.printStackTrace();
 			}
 		}
 	}
@@ -108,7 +113,7 @@ public class Listener implements Runnable {
 
 			case "BACKUP":	// BACKUP <file_path> <replicationDegree>							// criar thread para cada mensagem recebida?
 				System.out.println("client wanna do a BACKUP");
-				new Thread(new ServerMessageHandler(msg)).start();
+				new Thread(new ServerMessageHandler(msg, socket)).start();
 				break;
 
 		}
