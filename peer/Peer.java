@@ -14,11 +14,11 @@ public class Peer {
     private static String peerID;
 
     public Peer(String[] args){
-        peerID=args[2];
+        peerID=args[4];
         storage=new PeerStorage();
         exec = new ScheduledThreadPoolExecutor(99);
         peerServer = new PeerServer(args[0],Integer.parseInt(args[1]));
-        server = new RegisterServer();
+        server = new RegisterServer(args[2], Integer.parseInt(args[3]));
         exec.execute(peerServer);
         exec.execute(new Sender());
         //new Thread(server).start();
@@ -50,8 +50,8 @@ public class Peer {
 
 
     public static void main(String[] args){
-        if(args.length < 3){
-            System.out.println("Error, Usage: Peer peer_address peer_port peedID");
+        if(args.length < 6){
+            System.out.println("Error, Usage: Peer peer_address peer_port server_ip server_port peerID");
             return;
         }
         new Peer(args);

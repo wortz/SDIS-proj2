@@ -63,10 +63,10 @@ public class Server {
 		InetAddress addr = null;
 		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
 		peers.put(address, new SimpleEntry<Integer,SSLSocket>(port, socket));
-		peersOn.add(address);
+		peersOn.add(address + ":" + port);
 		System.out.println(peers);
 		System.out.println(peersOn);
-		new Thread( new Listener(socket, address)).start();
+		new Thread( new Listener(socket, address, port)).start();
 
 	}
 
@@ -147,29 +147,9 @@ public class Server {
 
 	}
 
-	public void sendMessage( String message ) {
+	public static void peerTimeout(String address, int port) {
 
-		try {
-
-		//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-		Socket clientSocket = new Socket("localhost", port);
-		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		//sentence = inFromUser.readLine();
-		outToServer.writeBytes(message + '\n');
-		String response = inFromServer.readLine();
-		System.out.println("FROM SERVER: " + response);
-		clientSocket.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void peerTimeout(String address) {
-
-		peersOn.remove(peersOn.indexOf(address));
+		peersOn.remove(peersOn.indexOf(address + ":" + port));
 		System.out.println("Peer removed : " + peersOn);
 
 	}
