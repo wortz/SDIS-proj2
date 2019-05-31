@@ -23,10 +23,12 @@ public class Listener implements Runnable {
 	Thread peertimeout;
 	ScheduledFuture<?> future;
 	Boolean peerOn;
+	String address;
 	
 	public Listener( SSLSocket socket, String address ) {
 
 		this.socket = socket;
+		this.address = address;
 
 		peertimeout = new Thread( new Runnable() {public void run () {		// Nao remove o peer mas diz que está off e para se a thread
 			System.out.println("timeout thread");
@@ -113,7 +115,7 @@ public class Listener implements Runnable {
 
 			case "BACKUP":	// BACKUP <file_path> <replicationDegree>							// criar thread para cada mensagem recebida?
 				System.out.println("client wanna do a BACKUP");
-				new Thread(new ServerMessageHandler(msg, socket)).start();
+				new Thread(new ServerMessageHandler(msg, socket, address)).start();
 				break;
 
 		}

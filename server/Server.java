@@ -3,7 +3,7 @@ package server;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.Random;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.*;
@@ -24,7 +24,7 @@ public class Server {
     private static ScheduledExecutorService scheduler;
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
-    private static HashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
+    private static ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
     private static ArrayList<String> peersOn;
     //private ServerSSL sslServer;
 
@@ -33,7 +33,7 @@ public class Server {
     public Server () {}
 	public Server ( String ipAddress, int port ) {
 
-		peers = new HashMap<String, Map.Entry<Integer, SSLSocket>>();
+		peers = new ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>>();
 		peersOn = new ArrayList<String>();
 
 		try {address = InetAddress.getByName( ipAddress );} catch (UnknownHostException e){e.printStackTrace();}
@@ -193,7 +193,7 @@ public class Server {
 		return scheduler;
 	}
 
-	public static synchronized HashMap<String, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
+	public static synchronized ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
 
 	public static synchronized ArrayList<String> getPeersOn() { return peersOn; }
 

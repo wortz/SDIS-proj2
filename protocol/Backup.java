@@ -33,7 +33,7 @@ public class Backup implements Runnable {
 
 
         try {
-            String headerAux = "PUTFILE " + " " + fileID + " ";
+            String headerAux = "PUTFILE " + " " + fileID + '\n';
             byte[] header = headerAux.getBytes("US-ASCII");
             byte[] body = Files.readAllBytes(Paths.get(this.path));
             byte[] message = new byte[header.length + body.length];
@@ -41,6 +41,7 @@ public class Backup implements Runnable {
             System.arraycopy(body, 0, message, header.length, body.length);
 
             String responseServer = registerServer.receiveServerMessage();
+            System.out.println("server response : " + responseServer);
             String[] parts = responseServer.split(" ");
 
             replicationDegree = Integer.parseInt(parts[2]);
@@ -48,8 +49,8 @@ public class Backup implements Runnable {
             System.out.println("PutChunk : " + fileID + '\n');
 
             for(int i = 0; i < replicationDegree; i++){
-                String peerIp = parts[3+i];
-                int peerPort = Integer.parseInt(parts[4+i]);
+                String peerIp = parts[3+i*2];
+                int peerPort = Integer.parseInt(parts[4+i*2]);
                 PeerToPeer(message, peerIp, peerPort);
             }
         } catch (IOException e) {
@@ -65,8 +66,8 @@ public class Backup implements Runnable {
         Socket socket;
         try{
             address = InetAddress.getByName(ip);
-            int port = portt;
-            socket = new Socket(address, port);
+            socket = new Socket(address, portt);
+            System.out.println("sent to peer: ip: " + ip + " port: " + portt);
             DataInputStream inFromPeer = new DataInputStream(socket.getInputStream());
             DataOutputStream outToPeer = new DataOutputStream(socket.getOutputStream());
             outToPeer.write(message);

@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.*;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerMessageHandler implements Runnable {
 
@@ -27,8 +28,10 @@ public class ServerMessageHandler implements Runnable {
 	ScheduledFuture<?> future;
 	Boolean peerOn;
 	String msg;
+	String peerAddress;
 	
-	public ServerMessageHandler( String msg, SSLSocket socketTopeer) {
+	public ServerMessageHandler( String msg, SSLSocket socketTopeer, String peerAddress) {
+		this.peerAddress = peerAddress;
 		this.socketTopeer = socketTopeer;
 		this.msg = msg;
 	}
@@ -49,26 +52,28 @@ public class ServerMessageHandler implements Runnable {
 
 	private int handleBackup( String file_path, int rd ) {
 
-		ArrayList<String> availablePeers = Server.getPeersOn();
+		ArrayList<String> availablePeers = (ArrayList<String>) Server.getPeersOn().clone();
+		availablePeers.remove(peerAddress);
 		int npeers = availablePeers.size();
 
 		System.out.println("availablePeers : " + availablePeers + "size: " + npeers);
 
 		String message = "BACKUPIPS " + file_path + " " + rd;
 
+
 		try {
 
-	        DataOutputStream outToServer = new DataOutputStream(socketTopeer.getOutputStream());
+	        DataOutputStream outToPeer = new DataOutputStream(socketTopeer.getOutputStream());
 	        //outToServer.writeBytes("BACKUPIPS "'\n');
 
 
 			if( npeers < rd ) {
 				System.out.println(" Not enough available peers ");
-				outToServer.writeBytes("ERROR - Not enough peers available for specified replication degree");
+				outToPeer.writeBytes("ERROR - Not enough peers available for specified replication degree\n");
 				return 0;
 			}
 
-			HashMap<String, Map.Entry<Integer, SSLSocket>> peers = Server.getPeers();
+			ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> peers = Server.getPeers();
 
 			for (int i = 0 ; i < rd ; i++ ) {
 
@@ -89,7 +94,7 @@ public class ServerMessageHandler implements Runnable {
 
 			System.out.println("MESSAGE : " + message);
 
-			outToServer.writeBytes(message);
+			outToPeer.writeBytes(message + '\n');
 
 		} catch (IOException e) {
 			e.printStackTrace();

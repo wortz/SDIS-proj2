@@ -49,13 +49,11 @@ public class RegisterServer implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("new thread RegisterServer");
 
         //timer = new Timer();
         //task = new TimerTask() {
             //public void run () {
                 try{
-                    System.out.println("INside task thread");
                     //DataInputStream inFromServer = new DataInputStream(socket.getInputStream());
                     //DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
                     outToServer.writeBytes("ONLINE " + PeerServer.getInetAddress() + " " + PeerServer.getPort() + '\n');
@@ -65,7 +63,6 @@ public class RegisterServer implements Runnable{
         //   }
         //};
         //timer.scheduleAtFixedRate(task, 1*500, 1*500);
-        System.out.println("end thread");
     }
 
     public synchronized void sendServerMessage(String message){       // fazer uma thread para enviar?
@@ -81,8 +78,9 @@ public class RegisterServer implements Runnable{
     public String receiveServerMessage(){
         String serverResponse = " ";
         try{
+
+            System.out.println("Server response before: " + serverResponse);
             serverResponse = inFromServer.readLine();
-            System.out.println("Server response : " + serverResponse);
         }catch(IOException e){
             e.printStackTrace();
         }
