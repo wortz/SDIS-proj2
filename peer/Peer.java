@@ -50,7 +50,7 @@ public class Peer {
 
 
     public static void main(String[] args){
-        if(args.length < 6){
+        if(args.length < 5){
             System.out.println("Error, Usage: Peer peer_address peer_port server_ip server_port peerID");
             return;
         }

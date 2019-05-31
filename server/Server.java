@@ -157,11 +157,11 @@ public class Server {
 	public static synchronized void removePeer(String address) {
 
 		String addr = address.toString();
-		System.out.println("addr : " + addr);
+		//System.out.println("addr : " + addr);
 
-		System.out.println("pers before remove" + peers);
+		//System.out.println("pers before remove" + peers);
 		peers.remove(addr);
-		System.out.println("pers after remove" + peers);
+		//System.out.println("pers after remove" + peers);
 
 	}
 
