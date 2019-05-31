@@ -23,10 +23,10 @@ public class RegisterServer implements Runnable{
     private BufferedReader inFromServer;
     private DataOutputStream outToServer;
 
-    public RegisterServer(){
+    public RegisterServer(String address, int port){
 
         try{
-            address = InetAddress.getByName("127.0.0.2");
+            this.address = InetAddress.getByName(address);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -34,7 +34,7 @@ public class RegisterServer implements Runnable{
         System.setProperty("javax.net.ssl.trustStorePassword","123456");
         System.setProperty("javax.net.ssl.keyStore","../client.keys");
         System.setProperty("javax.net.ssl.keyStorePassword","123456");
-		port = 4040;
+		this.port = port;
 
         try{
             socket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(address, port);

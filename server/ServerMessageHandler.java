@@ -29,8 +29,10 @@ public class ServerMessageHandler implements Runnable {
 	Boolean peerOn;
 	String msg;
 	String peerAddress;
+	int peerPort;
 	
-	public ServerMessageHandler( String msg, SSLSocket socketTopeer, String peerAddress) {
+	public ServerMessageHandler( String msg, SSLSocket socketTopeer, String peerAddress, int peerPort) {
+		this.peerPort = peerPort;
 		this.peerAddress = peerAddress;
 		this.socketTopeer = socketTopeer;
 		this.msg = msg;
@@ -44,21 +46,22 @@ public class ServerMessageHandler implements Runnable {
 
 		switch (params[0]) {
 			case "BACKUP":
-				handleBackup( params[1], Integer.parseInt(params[2]) );
+				handleBackup( params[1], Integer.parseInt(params[2]), params[3]);
 				break;
 		}
 
 	}
 
-	private int handleBackup( String file_path, int rd ) {
+	private int handleBackup( String file_path, int rd, String fileHash) {
 
 		ArrayList<String> availablePeers = (ArrayList<String>) Server.getPeersOn().clone();
-		availablePeers.remove(peerAddress);
+		availablePeers.remove(peerAddress + ":" + peerPort);
 		int npeers = availablePeers.size();
 
 		System.out.println("availablePeers : " + availablePeers + "size: " + npeers);
 
 		String message = "BACKUPIPS " + file_path + " " + rd;
+		ArrayList<String> futureBackups = new ArrayList();
 
 
 		try {
@@ -77,8 +80,13 @@ public class ServerMessageHandler implements Runnable {
 
 			for (int i = 0 ; i < rd ; i++ ) {
 
-				String addr = availablePeers.get(i);
+				String addr = availablePeers.get(i).split(":")[0];
+				System.out.println("peers " + peers);
+				System.out.println("peers " + peers.get(addr));
+
 				Integer port = peers.get(addr).getKey();
+
+				futureBackups.add(addr + ":" + port + ":" +fileHash);
 
 				try {
 					message += " ";
@@ -91,6 +99,9 @@ public class ServerMessageHandler implements Runnable {
 				}
 
 			}
+			Server.getFilesPeers().put(file_path, futureBackups);
+			
+			System.out.println("HASH MAP IS HERE" + Server.getFilesPeers());
 
 			System.out.println("MESSAGE : " + message);
 

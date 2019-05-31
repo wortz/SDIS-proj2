@@ -25,7 +25,10 @@ public class Server {
     private Thread electionTimeoutThread;
     private SSLServerSocket serverSocket;
     private static ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
-    private static ArrayList<String> peersOn;
+	
+	//for a file ID saves the peers it is backed up 
+	private static ConcurrentHashMap<String, ArrayList<String>> filesPeers;	// File, ip, port	
+	private static ArrayList<String> peersOn;
     //private ServerSSL sslServer;
 
     private static Server server_instance;	// fazer synchronized ???
@@ -34,6 +37,7 @@ public class Server {
 	public Server ( String ipAddress, int port ) {
 
 		peers = new ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>>();
+		filesPeers = new ConcurrentHashMap<String, ArrayList<String>>();
 		peersOn = new ArrayList<String>();
 
 		try {address = InetAddress.getByName( ipAddress );} catch (UnknownHostException e){e.printStackTrace();}
@@ -59,10 +63,10 @@ public class Server {
 		InetAddress addr = null;
 		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
 		peers.put(address, new SimpleEntry<Integer,SSLSocket>(port, socket));
-		peersOn.add(address);
+		peersOn.add(address + ":" + port);
 		System.out.println(peers);
 		System.out.println(peersOn);
-		new Thread( new Listener(socket, address)).start();
+		new Thread( new Listener(socket, address, port)).start();
 
 	}
 
@@ -143,29 +147,9 @@ public class Server {
 
 	}
 
-	public void sendMessage( String message ) {
+	public static void peerTimeout(String address, int port) {
 
-		try {
-
-		//BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-		Socket clientSocket = new Socket("localhost", port);
-		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		//sentence = inFromUser.readLine();
-		outToServer.writeBytes(message + '\n');
-		String response = inFromServer.readLine();
-		System.out.println("FROM SERVER: " + response);
-		clientSocket.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void peerTimeout(String address) {
-
-		peersOn.remove(peersOn.indexOf(address));
+		peersOn.remove(peersOn.indexOf(address + ":" + port));
 		System.out.println("Peer removed : " + peersOn);
 
 	}
@@ -196,6 +180,13 @@ public class Server {
 	public static synchronized ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> getPeers() { return peers; }
 
 	public static synchronized ArrayList<String> getPeersOn() { return peersOn; }
+
+	/**
+	 * @return the filesPeers
+	 */
+	public static synchronized ConcurrentHashMap<String, ArrayList<String>> getFilesPeers() {
+		return filesPeers;
+	}
 
 	public static void main( String[] args ) {
    	 	if ( args.length == 2 ) {

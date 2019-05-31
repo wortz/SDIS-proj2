@@ -1,7 +1,6 @@
 package protocol;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +8,6 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.net.DatagramPacket;
 
 import peer.RegisterServer;
 import utility.*;
@@ -35,15 +33,8 @@ public class Backup implements Runnable {
 
         try {
             String headerAux = "PUTFILE " + fileID;
-            //byte[] header = headerAux.getBytes("US-ASCII");
             byte[] body = Files.readAllBytes(Paths.get(this.path));
-            //byte[] message = new byte[header.length + body.length];
-
             Message msg = new Message(headerAux, body);
-
-            //System.arraycopy(header, 0, message, 0, header.length);
-            //System.arraycopy(body, 0, message, header.length, body.length);
-
             String responseServer = registerServer.receiveServerMessage();
             System.out.println("server response : " + responseServer);
             String[] parts = responseServer.split(" ");
@@ -65,7 +56,6 @@ public class Backup implements Runnable {
     //sends the message with file from peer to another peer receiving as arguments the message the ip
     //and port  of the receiving peer
     public void PeerToPeer(Message msg, String ip, int portt){
-
         InetAddress address;
         Socket socket;
         try{
