@@ -3,15 +3,16 @@ package peer;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.FileOutputStream;
 import utility.Message;
 import java.nio.charset.StandardCharsets;
 
 public class MessageHandler implements Runnable {
-    private DataOutputStream writer;
+    private ObjectOutputStream writer;
     private Message message;
 
-    MessageHandler(DataOutputStream outToClient, Message receivedMessage) {
+    MessageHandler(ObjectOutputStream outToClient, Message receivedMessage) {
         writer = outToClient;
         message = receivedMessage;
     }
@@ -39,7 +40,8 @@ public class MessageHandler implements Runnable {
     private void handlePutFile(String fileID) {
         byte[] body = message.getBody();
         Peer.storage.addFile(fileID, body);
-        String response = "STORED " + fileID + '\n';
+        String response = "STORED " + fileID;
+        Message respMsg=new Message(response);
         String pathBackup = "../PeerStorage/peer" + Peer.getPeerID() + "/" + "backup/";
         File backupDir = new File(pathBackup);
         if (!backupDir.exists()) {
@@ -62,7 +64,7 @@ public class MessageHandler implements Runnable {
             e.printStackTrace();
         }
         try {
-            writer.writeBytes(response);
+            writer.writeObject(respMsg);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,9 +72,10 @@ public class MessageHandler implements Runnable {
 
     private void handleGetFile(String fileID) {
         byte[] body = Peer.storage.getFile(fileID);
-        String response = "FILE " + fileID + '\n' + body;
+        String response = "FILE " + fileID;
+        Message respMsg=new Message(response, body);
         try {
-            writer.writeBytes(response);
+            writer.writeObject(respMsg);
         } catch (Exception e) {
             e.printStackTrace();
         }

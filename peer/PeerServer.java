@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import utility.Message;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class PeerServer implements Runnable{
@@ -42,7 +43,7 @@ public class PeerServer implements Runnable{
             while (true) {
                 Socket connectionSocket = peerSocket.accept();
                 ObjectInputStream inFromClient = new ObjectInputStream(connectionSocket.getInputStream());
-                DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
+                ObjectOutputStream outToClient = new ObjectOutputStream(connectionSocket.getOutputStream());
                 Message receivedMessage = (Message) inFromClient.readObject();
 
                 Peer.getExec().execute(new MessageHandler(outToClient, receivedMessage));

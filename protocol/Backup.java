@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.ObjectOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Files;
@@ -29,7 +30,7 @@ public class Backup implements Runnable {
         String fileID = Utility.getFileSHA(file);
 
         RegisterServer registerServer = Peer.getServer();
-        registerServer.sendServerMessage("BACKUP " + path + " " + replicationDegree + '\n');
+        registerServer.sendServerMessage("BACKUP " + path + " " + replicationDegree + " " + fileID + '\n');
 
         try {
             String headerAux = "PUTFILE " + fileID;
@@ -38,8 +39,6 @@ public class Backup implements Runnable {
             String responseServer = registerServer.receiveServerMessage();
             System.out.println("server response : " + responseServer);
             String[] parts = responseServer.split(" ");
-
-            replicationDegree = Integer.parseInt(parts[2]);
 
             System.out.println("PutChunk : " + fileID + '\n');
 
@@ -55,21 +54,23 @@ public class Backup implements Runnable {
 
     //sends the message with file from peer to another peer receiving as arguments the message the ip
     //and port  of the receiving peer
-    public void PeerToPeer(Message msg, String ip, int portt){
+    public Message PeerToPeer(Message msg, String ip, int portt){
         InetAddress address;
         Socket socket;
         try{
             address = InetAddress.getByName(ip);
             socket = new Socket(address, portt);
             System.out.println("sent to peer: ip: " + ip + " port: " + portt);
-            DataInputStream inFromPeer = new DataInputStream(socket.getInputStream());
+            ObjectInputStream inFromPeer = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream outToPeer = new ObjectOutputStream(socket.getOutputStream());
-            //DataOutputStream outToPeer = new DataOutputStream(socket.getOutputStream());
             outToPeer.writeObject(msg);
+            return ((Message) inFromPeer.readObject());
 
         } catch(Exception e) {
             e.printStackTrace();
         }
+
+        return null;
         
 
     }
