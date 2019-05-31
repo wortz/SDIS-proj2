@@ -52,11 +52,39 @@ public class ServerMessageHandler implements Runnable {
 			case "BACKUP":
 				handleBackup( params[1], Integer.parseInt(params[2]), "hash");
 				break;
+			case "RESTORE":
+				handleRestore( params[0]);
+				break;
 		}
 
 	}
 
-	private int handleBackup( String file_path, int rd, String fileHash) {
+	private int handleRestore( String file_path ) { // resotreips hash ip_peer ip_port
+
+		ConcurrentHashMap<String, ArrayList<String>> filesPeers = Server.getFilesPeers();
+		ArrayList<String> peerFiles = (ArrayList<String>) filesPeers.get(file_path);
+		String selectedPeer = peerFiles.get(0);
+		String[] params = selectedPeer.split(" ");
+
+		String message = "RESTOREIPS " + params[2] + " " + params[0] + " " + params[1];
+
+		DataOutputStream outToPeer;
+		try {
+
+			outToPeer = new DataOutputStream(socketTopeer.getOutputStream());
+
+			outToPeer.writeBytes(message + '\n');
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return 1;
+
+	}
+
+	private int handleBackup( String file_path, int rd, String fileHash) { 
 
 		System.out.println("availafwfwfwefewf ");
 

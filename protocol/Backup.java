@@ -60,11 +60,12 @@ public class Backup implements Runnable {
         try{
             address = InetAddress.getByName(ip);
             socket = new Socket(address, portt);
-            System.out.println("sent to peer: ip: " + ip + " port: " + portt);
-            ObjectInputStream inFromPeer = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream outToPeer = new ObjectOutputStream(socket.getOutputStream());
             outToPeer.writeObject(msg);
-            return ((Message) inFromPeer.readObject());
+            ObjectInputStream inFromPeer = new ObjectInputStream(socket.getInputStream());
+            Message response = (Message) inFromPeer.readObject();
+            socket.close();
+            return response;
 
         } catch(Exception e) {
             e.printStackTrace();

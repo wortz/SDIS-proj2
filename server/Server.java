@@ -27,7 +27,7 @@ public class Server {
     private static ConcurrentHashMap<String, Map.Entry<Integer, SSLSocket>> peers;	// ip,	port, socket
 	
 	//for a file ID saves the peers it is backed up 
-	private static ConcurrentHashMap<String, ArrayList<String>> filesPeers;	// File, ip, port	
+	private static ConcurrentHashMap<String, ArrayList<String>> filesPeers;	// File, ip:port:hash	
 	private static ArrayList<String> peersOn;
     //private ServerSSL sslServer;
 
@@ -64,7 +64,6 @@ public class Server {
 		try {addr = InetAddress.getByName( address );} catch (UnknownHostException e){e.printStackTrace();}
 		peers.put(address, new SimpleEntry<Integer,SSLSocket>(port, socket));
 		peersOn.add(address + ":" + port);
-		System.out.println(peers);
 		System.out.println(peersOn);
 		new Thread( new Listener(socket, address, port)).start();
 

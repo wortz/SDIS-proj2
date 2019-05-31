@@ -81,13 +81,13 @@ public class Listener implements Runnable {
 
 
 		while(peerOn){
-			System.out.println("inside while Listener");
+			//System.out.println("inside while Listener");
 			try {
 
 					BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					System.out.println("before readline LISTENER");
+					//System.out.println("before readline LISTENER");
 					String msg = inFromClient.readLine();
-					System.out.println("after readline LISTENER");
+					//System.out.println("after readline LISTENER");
 					if(!peerOn){ return;}										//já deu timeout
 					System.out.println("Client message: " + msg);
 
@@ -110,13 +110,18 @@ public class Listener implements Runnable {
 		switch(params[0]){
 
 			case "ONLINE":												// TODO? atualizar o ip e porta? que o peer manda
-				System.out.println("client is ONLINE");
+				//System.out.println("client is ONLINE");
 				future.cancel(false);							// para dar reset ao timeout
 				future = Server.getScheduler().scheduleAtFixedRate( peertimeout, 5000, 5000, TimeUnit.MILLISECONDS );
 				break;
 
 			case "BACKUP":	// BACKUP <file_path> <replicationDegree> <FileID>				// criar thread para cada mensagem recebida?
 				System.out.println("client wanna do a BACKUP");
+				Server.getScheduler().execute(new ServerMessageHandler(msg, socket, address, port));
+				break;
+
+			case "RESTORE":	// RESTORE <file_path>				// criar thread para cada mensagem recebida?
+				System.out.println("client wanna do a RESTORE");
 				Server.getScheduler().execute(new ServerMessageHandler(msg, socket, address, port));
 				break;
 

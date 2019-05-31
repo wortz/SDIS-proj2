@@ -44,6 +44,7 @@ public class PeerServer implements Runnable{
                 Socket connectionSocket = peerSocket.accept();
                 ObjectInputStream inFromClient = new ObjectInputStream(connectionSocket.getInputStream());
                 ObjectOutputStream outToClient = new ObjectOutputStream(connectionSocket.getOutputStream());
+                System.out.println("waiting for message");
                 Message receivedMessage = (Message) inFromClient.readObject();
 
                 Peer.getExec().execute(new MessageHandler(outToClient, receivedMessage));

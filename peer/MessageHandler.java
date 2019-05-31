@@ -51,9 +51,6 @@ public class MessageHandler implements Runnable {
         String fileDir = pathBackup + fileID;
         File fileFile = new File(fileDir);
 
-        System.out.println(fileDir);
-        System.out.println(fileFile.exists());
-
         try{
             if (!fileFile.exists()) {
                 FileOutputStream fos = new FileOutputStream(fileDir);

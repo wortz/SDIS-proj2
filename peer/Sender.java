@@ -28,21 +28,21 @@ public class Sender implements Runnable{
                         }
                         Peer.getExec().execute(new Backup(requestSplit[1], Integer.parseInt(requestSplit[2])));
                         break;
-                    case "Restore":
+                    case "RESTORE":
                         if(requestSplit.length != 2){
                             System.out.println("Error: The format must be : RESTORE <filePath>");
                             break;
                         }
-                        //Peer.getServer().sendServerMessage();
+                        Peer.getExec().execute(new Restore(requestSplit[1]));
                         break;
-                    case "Delete":
+                    case "DELETE":
                         if(requestSplit.length != 2){
                             System.out.println("Error: The format must be : DELETE <filePath>");
                             break;
                         }
                         //Peer.getServer().sendServerMessage();
                         break;
-                    case "Reclaim":
+                    case "RECLAIM":
                         System.out.println("That protocol was not implemented.");
                         break;
                     default:
