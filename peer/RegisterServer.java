@@ -16,7 +16,8 @@ import javax.net.ssl.SSLSocketFactory;
 public class RegisterServer implements Runnable{
     
     private InetAddress address;
-    private SSLSocket socket;
+    private int port;
+    private static SSLSocket socket;
     Timer timer;
     TimerTask task;
 
@@ -29,7 +30,7 @@ public class RegisterServer implements Runnable{
         }
         System.setProperty("javax.net.ssl.trustStore","truststore");
         System.setProperty("javax.net.ssl.trustStorePassword","123456");
-		int port = 4040;
+		port = 4040;
 
         try{
             socket = (SSLSocket) ((SSLSocketFactory) SSLSocketFactory.getDefault()).createSocket(address, port);
@@ -65,13 +66,32 @@ public class RegisterServer implements Runnable{
         System.out.println("end thread");
     }
 
-    public synchronized void sendServerMessage(){       // fazer uma thread para enviar?
+    public synchronized void sendServerMessage(String message){       // fazer uma thread para enviar?
         try{
             DataOutputStream outToServer = new DataOutputStream(socket.getOutputStream());
-            outToServer.writeBytes("BOAS UM PROTOCOLO\n");
+            outToServer.writeBytes(message);
+
         } catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    public String receiveServerMessage(){
+        String serverResponse = " ";
+        try{
+            BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            serverResponse = inFromClient.readLine();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        return serverResponse;
+    }
+
+    /**
+     * @return the socket
+     */
+    public static SSLSocket getSocket() {
+        return socket;
     }
 
     

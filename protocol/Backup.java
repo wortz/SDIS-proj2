@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import peer.RegisterServer;
 import utility.Utility;
 
 public class Backup implements Runnable {
@@ -26,6 +27,10 @@ public class Backup implements Runnable {
         File file = new File(this.path);
         String fileID = Utility.getFileSHA(file);
 
+        RegisterServer registerServer = new RegisterServer();
+        registerServer.sendServerMessage("BACKUP " + path + " " + replicationDegree);
+
+
         try {
             String headerAux = "PUTFILE " + " " + fileID + " ";
             byte[] header = headerAux.getBytes("US-ASCII");
@@ -33,11 +38,19 @@ public class Backup implements Runnable {
             byte[] message = new byte[header.length + body.length];
             System.arraycopy(header, 0, message, 0, header.length);
             System.arraycopy(body, 0, message, header.length, body.length);
-            System.out.println("PutChunk : " + fileID + '\n');
-            PeerToPeer(message);
-            //PeerToPeer(message);
 
-            
+            String responseServer = registerServer.receiveServerMessage();
+            String[] parts = responseServer.split(" ");
+
+            replicationDegree = Integer.parseInt(parts[2]);
+
+            System.out.println("PutChunk : " + fileID + '\n');
+
+            for(int i = 0; i < replicationDegree; i++){
+                String peerIp = parts[3+i];
+                int peerPort = Integer.parseInt(parts[4+i]);
+                PeerToPeer(message, peerIp, peerPort);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -45,24 +58,18 @@ public class Backup implements Runnable {
 
     //sends the message with file from peer to another peer receiving as arguments the message the ip 
     //and port  of the receiving peer
-    
-    //public void PeerToPeer(byte[] message, String peerAddress, int peerPort)
-    //public void PeerToPeer(byte[] message, InetAddress peerAddress, int peerPort){
-    public void PeerToPeer(byte[] message){
+    public void PeerToPeer(byte[] message, String ip, int portt){
         
         InetAddress address;
         Socket socket;
         try{
-            address = InetAddress.getByName("127.0.0.6");
-            //address = InetAddress.getByName(peerAdress);
-            //address = peerAddress;
-            int port = 4040;
-            //int port = peerPort;
+            address = InetAddress.getByName(ip);
+            int port = portt;
             socket = new Socket(address, port);
             DataInputStream inFromPeer = new DataInputStream(socket.getInputStream());
-
             DataOutputStream outToPeer = new DataOutputStream(socket.getOutputStream());
             outToPeer.write(message);
+
         } catch(Exception e) {
             e.printStackTrace();
         }
