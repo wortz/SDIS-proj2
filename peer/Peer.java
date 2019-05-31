@@ -3,14 +3,19 @@ package peer;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import storage.*;
 
 public class Peer {
 
     private static PeerServer peerServer;
     private static ScheduledExecutorService exec;
     private static RegisterServer server;
+    public static PeerStorage storage;
+    private static String peerID;
 
     public Peer(String[] args){
+        peerID=args[2];
+        storage=new PeerStorage();
         exec = new ScheduledThreadPoolExecutor(99);
         peerServer = new PeerServer(args[0],Integer.parseInt(args[1]));
         server = new RegisterServer();
@@ -37,12 +42,16 @@ public class Peer {
         return server;
     }
 
+    public static String getPeerID(){
+        return peerID;
+    }
+
     
 
 
     public static void main(String[] args){
-        if(args.length < 2){
-            System.out.println("Error, Usage: Peer peer_address peer_port");
+        if(args.length < 3){
+            System.out.println("Error, Usage: Peer peer_address peer_port peedID");
             return;
         }
         new Peer(args);
