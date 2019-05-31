@@ -2,15 +2,17 @@ package protocol;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.net.DatagramPacket;
 
 import peer.RegisterServer;
-import utility.Utility;
+import utility.*;
 import peer.Peer;
 
 public class Backup implements Runnable {
@@ -31,14 +33,16 @@ public class Backup implements Runnable {
         RegisterServer registerServer = Peer.getServer();
         registerServer.sendServerMessage("BACKUP " + path + " " + replicationDegree + '\n');
 
-
         try {
-            String headerAux = "PUTFILE " + " " + fileID + '\n';
-            byte[] header = headerAux.getBytes("US-ASCII");
+            String headerAux = "PUTFILE " + " " + fileID;
+            //byte[] header = headerAux.getBytes("US-ASCII");
             byte[] body = Files.readAllBytes(Paths.get(this.path));
-            byte[] message = new byte[header.length + body.length];
-            System.arraycopy(header, 0, message, 0, header.length);
-            System.arraycopy(body, 0, message, header.length, body.length);
+            //byte[] message = new byte[header.length + body.length];
+
+            Message msg = new Message(headerAux, body);
+
+            //System.arraycopy(header, 0, message, 0, header.length);
+            //System.arraycopy(body, 0, message, header.length, body.length);
 
             String responseServer = registerServer.receiveServerMessage();
             System.out.println("server response : " + responseServer);
@@ -51,7 +55,7 @@ public class Backup implements Runnable {
             for(int i = 0; i < replicationDegree; i++){
                 String peerIp = parts[3+i*2];
                 int peerPort = Integer.parseInt(parts[4+i*2]);
-                PeerToPeer(message, peerIp, peerPort);
+                PeerToPeer(msg, peerIp, peerPort);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -60,8 +64,8 @@ public class Backup implements Runnable {
 
     //sends the message with file from peer to another peer receiving as arguments the message the ip
     //and port  of the receiving peer
-    public void PeerToPeer(byte[] message, String ip, int portt){
-        
+    public void PeerToPeer(Message msg, String ip, int portt){
+
         InetAddress address;
         Socket socket;
         try{
@@ -69,8 +73,9 @@ public class Backup implements Runnable {
             socket = new Socket(address, portt);
             System.out.println("sent to peer: ip: " + ip + " port: " + portt);
             DataInputStream inFromPeer = new DataInputStream(socket.getInputStream());
-            DataOutputStream outToPeer = new DataOutputStream(socket.getOutputStream());
-            outToPeer.write(message);
+            ObjectOutputStream outToPeer = new ObjectOutputStream(socket.getOutputStream());
+            //DataOutputStream outToPeer = new DataOutputStream(socket.getOutputStream());
+            outToPeer.writeObject(msg);
 
         } catch(Exception e) {
             e.printStackTrace();

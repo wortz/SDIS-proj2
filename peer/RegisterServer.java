@@ -32,6 +32,8 @@ public class RegisterServer implements Runnable{
         }
         System.setProperty("javax.net.ssl.trustStore","../truststore");
         System.setProperty("javax.net.ssl.trustStorePassword","123456");
+        System.setProperty("javax.net.ssl.keyStore","../client.keys");
+        System.setProperty("javax.net.ssl.keyStorePassword","123456");
 		port = 4040;
 
         try{

@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import utility.Message;
+import java.io.ObjectInputStream;
+import java.nio.charset.StandardCharsets;
 
 public class PeerServer implements Runnable{
     private static InetAddress peerAddress;
@@ -39,9 +42,11 @@ public class PeerServer implements Runnable{
         try{
             while (true) {
                 Socket connectionSocket = peerSocket.accept();
-                BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+                ObjectInputStream inFromClient = new ObjectInputStream(connectionSocket.getInputStream());
                 DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
-                System.out.println(inFromClient.readLine());
+                Message receivedMessage = (Message) inFromClient.readObject();
+                System.out.println(receivedMessage.header);
+                System.out.println(new String(receivedMessage.body, StandardCharsets.UTF_8));
                 //System.out.println("Received: " + request);
                 connectionSocket.close();
            }
