@@ -13,9 +13,6 @@ import java.util.TimerTask;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import com.sun.net.ssl.internal.ssl.Provider;
-
-
 public class RegisterServer implements Runnable{
     
     private InetAddress address;
