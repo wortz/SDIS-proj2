@@ -33,14 +33,14 @@ public class Sender implements Runnable{
                             System.out.println("Error: The format must be : RESTORE <filePath>");
                             break;
                         }
-                        Peer.getServer().sendServerMessage();
+                        //Peer.getServer().sendServerMessage();
                         break;
                     case "Delete":
                         if(requestSplit.length != 2){
                             System.out.println("Error: The format must be : DELETE <filePath>");
                             break;
                         }
-                        Peer.getServer().sendServerMessage();
+                        //Peer.getServer().sendServerMessage();
                         break;
                     case "Reclaim":
                         System.out.println("That protocol was not implemented.");
