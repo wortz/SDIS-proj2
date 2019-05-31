@@ -25,7 +25,6 @@ public class PeerServer implements Runnable{
         }
     }
 
-
     public synchronized static InetAddress getInetAddress(){
         return peerAddress;
     }

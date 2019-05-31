@@ -60,7 +60,7 @@ public class MessageHandler implements Runnable {
 
         try{
             if (!fileFile.exists()) {
-                 System.out.println("body 1: " + new String(message.getBody(), StandardCharsets.UTF_8));
+                System.out.println("body 1: " + new String(message.getBody(), StandardCharsets.UTF_8));
                 FileOutputStream fos = new FileOutputStream(fileDir);
                 fos.write(body);
             }

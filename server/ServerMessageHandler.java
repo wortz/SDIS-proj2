@@ -29,8 +29,10 @@ public class ServerMessageHandler implements Runnable {
 	Boolean peerOn;
 	String msg;
 	String peerAddress;
+	int peerPort;
 	
-	public ServerMessageHandler( String msg, SSLSocket socketTopeer, String peerAddress) {
+	public ServerMessageHandler( String msg, SSLSocket socketTopeer, String peerAddress, int peerPort) {
+		this.peerPort = peerPort;
 		this.peerAddress = peerAddress;
 		this.socketTopeer = socketTopeer;
 		this.msg = msg;
@@ -53,7 +55,7 @@ public class ServerMessageHandler implements Runnable {
 	private int handleBackup( String file_path, int rd ) {
 
 		ArrayList<String> availablePeers = (ArrayList<String>) Server.getPeersOn().clone();
-		availablePeers.remove(peerAddress);
+		availablePeers.remove(peerAddress + ":" + peerPort);
 		int npeers = availablePeers.size();
 
 		System.out.println("availablePeers : " + availablePeers + "size: " + npeers);
@@ -77,7 +79,10 @@ public class ServerMessageHandler implements Runnable {
 
 			for (int i = 0 ; i < rd ; i++ ) {
 
-				String addr = availablePeers.get(i);
+				String addr = availablePeers.get(i).split(":")[0];
+				System.out.println("peers " + peers);
+				System.out.println("peers " + peers.get(addr));
+
 				Integer port = peers.get(addr).getKey();
 
 				try {
