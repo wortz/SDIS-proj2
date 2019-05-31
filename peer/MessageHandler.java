@@ -5,25 +5,27 @@ import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import utility.Message;
+import java.nio.charset.StandardCharsets;
 
 public class MessageHandler implements Runnable {
     private DataOutputStream writer;
-    private String[] messageSplit;
-    private String message;
+    private Message message;
 
-    MessageHandler(DataOutputStream outToClient, String receivedMessage) {
+    MessageHandler(DataOutputStream outToClient, Message receivedMessage) {
         writer = outToClient;
-        messageSplit = getHeaderPacket(receivedMessage);
         message = receivedMessage;
     }
 
     @Override
     public void run() {
-        String[] messageHeader = messageSplit[0].split(" ");
+        String[] messageHeader = message.getHeader().split(" ");
+        System.out.println("params : " + message.getHeader());
         switch (messageHeader[0]) {
         case "PUTFILE":
             handlePutFile(messageHeader[1]);
@@ -41,27 +43,28 @@ public class MessageHandler implements Runnable {
     }
 
     private void handlePutFile(String fileID) {
-        String body = message.substring(messageSplit[0].length(), message.length() - 1); // talvez seja -1
+        byte[] body = message.getBody();
         Peer.storage.addFile(fileID, body);
         String response = "STORED " + fileID + '\n';
-        String pathBackup = "../PeerStorage/peer" + Peer.getPeerID() + "/" + "backup";
+        String pathBackup = "../PeerStorage/peer" + Peer.getPeerID() + "/" + "backup/";
         File backupDir = new File(pathBackup);
         if (!backupDir.exists()) {
             backupDir.mkdirs();
         }
-        String pathFileId = pathBackup + "/" + fileID;
-        File pathToFile = new File(pathFileId);
-        if (!pathToFile.exists()) {
-            pathToFile.mkdir();
-        }
-        String fileDir = pathToFile + fileID;
+
+        String fileDir = pathBackup + fileID;
         File fileFile = new File(fileDir);
+
+        System.out.println(fileDir);
+        System.out.println(fileFile.exists());
+
         try{
             if (!fileFile.exists()) {
+                 System.out.println("body 1: " + new String(message.getBody(), StandardCharsets.UTF_8));
                 FileOutputStream fos = new FileOutputStream(fileDir);
-                fos.write(body.getBytes());
+                fos.write(body);
             }
-        }catch(Exception e){
+        }catch(IOException e){
             e.printStackTrace();
         }
         try {
@@ -72,7 +75,7 @@ public class MessageHandler implements Runnable {
     }
 
     private void handleGetFile(String fileID) {
-        String body = Peer.storage.getFile(fileID);
+        byte[] body = Peer.storage.getFile(fileID);
         String response = "FILE " + fileID + '\n' + body;
         try {
             writer.writeBytes(response);
@@ -83,10 +86,5 @@ public class MessageHandler implements Runnable {
 
     private void handleDelete(String fileID) {
         Peer.storage.deleteFile(fileID);
-    }
-
-    public String[] getHeaderPacket(String receivedMessage) {
-        String[] lines = receivedMessage.split(System.getProperty("line.separator"));
-        return lines;
     }
 }

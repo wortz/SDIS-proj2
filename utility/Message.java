@@ -2,8 +2,8 @@ package utility;
 
 public class Message implements java.io.Serializable {
 
-	public String header;
-	public byte[] body;
+	private String header;
+	private byte[] body;
 
 	public Message(String header, byte[] body) {
 
@@ -11,5 +11,8 @@ public class Message implements java.io.Serializable {
 		this.body = body;
 
 	}
+
+	public String getHeader() { return header; }
+	public byte[] getBody() { return body; }
 
 }

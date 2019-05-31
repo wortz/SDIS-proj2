@@ -45,10 +45,12 @@ public class PeerServer implements Runnable{
                 ObjectInputStream inFromClient = new ObjectInputStream(connectionSocket.getInputStream());
                 DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
                 Message receivedMessage = (Message) inFromClient.readObject();
-                System.out.println(receivedMessage.header);
-                System.out.println(new String(receivedMessage.body, StandardCharsets.UTF_8));
-                //System.out.println("Received: " + request);
-                connectionSocket.close();
+
+                Peer.getExec().execute(new MessageHandler(outToClient, receivedMessage));
+
+                System.out.println("message : " + receivedMessage);
+
+                //connectionSocket.close(); // ONDE METEMOS ISTO
            }
         }catch(Exception e){
             e.printStackTrace();

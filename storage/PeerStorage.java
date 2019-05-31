@@ -3,13 +3,13 @@ package storage;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PeerStorage{
-    private ConcurrentHashMap<String,String> savedFiles;
+    private ConcurrentHashMap<String,byte[]> savedFiles;
 
     public PeerStorage(){
-        savedFiles=new ConcurrentHashMap<String,String>();
+        savedFiles=new ConcurrentHashMap<String,byte[]>();
     }
 
-    public void addFile(String fileID, String body){
+    public void addFile(String fileID, byte[] body){
         savedFiles.put(fileID, body);
     }
 
@@ -17,7 +17,7 @@ public class PeerStorage{
         savedFiles.remove(fileID);
     }
 
-    public String getFile(String fileID){
+    public byte[] getFile(String fileID){
         return savedFiles.get(fileID);
     }
 }

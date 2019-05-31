@@ -34,7 +34,7 @@ public class Backup implements Runnable {
         registerServer.sendServerMessage("BACKUP " + path + " " + replicationDegree + '\n');
 
         try {
-            String headerAux = "PUTFILE " + " " + fileID;
+            String headerAux = "PUTFILE " + fileID;
             //byte[] header = headerAux.getBytes("US-ASCII");
             byte[] body = Files.readAllBytes(Paths.get(this.path));
             //byte[] message = new byte[header.length + body.length];
