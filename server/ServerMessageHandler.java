@@ -43,16 +43,22 @@ public class ServerMessageHandler implements Runnable {
 		System.out.println("new MSG HANDLER");
 
 		String[] params = msg.split(" ");
+		
+
+
+		System.out.println(msg);
 
 		switch (params[0]) {
 			case "BACKUP":
-				handleBackup( params[1], Integer.parseInt(params[2]), params[3]);
+				handleBackup( params[1], Integer.parseInt(params[2]), "hash");
 				break;
 		}
 
 	}
 
 	private int handleBackup( String file_path, int rd, String fileHash) {
+
+		System.out.println("availafwfwfwefewf ");
 
 		ArrayList<String> availablePeers = (ArrayList<String>) Server.getPeersOn().clone();
 		availablePeers.remove(peerAddress + ":" + peerPort);
