@@ -1,15 +1,9 @@
 package peer;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import utility.Message;
 import java.nio.charset.StandardCharsets;
 
@@ -60,9 +54,9 @@ public class MessageHandler implements Runnable {
 
         try{
             if (!fileFile.exists()) {
-                 System.out.println("body 1: " + new String(message.getBody(), StandardCharsets.UTF_8));
                 FileOutputStream fos = new FileOutputStream(fileDir);
                 fos.write(body);
+                fos.close();
             }
         }catch(IOException e){
             e.printStackTrace();
@@ -86,5 +80,15 @@ public class MessageHandler implements Runnable {
 
     private void handleDelete(String fileID) {
         Peer.storage.deleteFile(fileID);
+        String pathBackup = "../PeerStorage/peer" + Peer.getPeerID() + "/" + "backup";
+        File backupDir = new File(pathBackup);
+        if (!backupDir.exists()) {
+            backupDir.mkdirs();
+        }
+        String pathFileId = pathBackup + "/" + fileID;
+        File fileFile = new File(pathFileId);
+        if(fileFile.exists()){
+            fileFile.delete();
+        }
     }
 }
